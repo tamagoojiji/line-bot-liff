@@ -5,7 +5,7 @@
   'use strict';
 
   // === 設定 ===
-  var LIFF_ID = 'LIFF_ID_HERE'; // LINE Developers Console で取得後に設定
+  var LIFF_ID = '2009188037-EJ4sq6gE';
 
   // === DOM要素 ===
   var searchInput = document.getElementById('searchInput');
