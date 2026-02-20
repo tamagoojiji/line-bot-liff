@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>アプリ選択メニュー</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- ヘッダー -->
+  <div class="header">
+    <h1>\ud83c\udfaf アプリ一覧</h1>
+    <div class="search-bar">
+      <span class="search-icon">\ud83d\udd0d</span>
+      <input type="text" id="searchInput" placeholder="アプリを検索...">
+    </div>
+  </div>
+
+  <!-- カテゴリタブ -->
+  <div id="categories" class="categories"></div>
+
+  <!-- アプリグリッド -->
+  <div id="appGrid" class="app-grid">
+    <div class="loading"><div class="loading-spinner"></div></div>
+  </div>
+
+  <!-- LIFF SDK -->
+  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
