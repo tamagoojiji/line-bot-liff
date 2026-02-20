@@ -92,7 +92,7 @@
     if (filtered.length === 0) {
       appGrid.innerHTML =
         '<div class="empty-state">' +
-        '<div class="empty-icon">\ud83d\udd0d</div>' +
+        '<div class="empty-icon">🔍</div>' +
         '<p>アプリが見つかりません</p>' +
         '</div>';
       return;
