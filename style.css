@@ -194,131 +194,6 @@ body {
   to { transform: rotate(360deg); }
 }
 
-/* プロフィール登録フォーム */
-.profile-form {
-  min-height: 100vh;
-  background: #fff;
-}
-
-.profile-header {
-  background: linear-gradient(135deg, #1a73e8, #4285f4);
-  color: #fff;
-  padding: 40px 20px 30px;
-  text-align: center;
-}
-
-.profile-header h1 {
-  font-size: 22px;
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-
-.profile-header p {
-  font-size: 13px;
-  opacity: 0.9;
-  line-height: 1.6;
-}
-
-.profile-body {
-  padding: 24px 20px;
-}
-
-.form-group {
-  margin-bottom: 24px;
-}
-
-.form-group label {
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 8px;
-}
-
-.form-group input[type="text"] {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 16px;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.form-group input[type="text"]:focus {
-  border-color: #1a73e8;
-}
-
-.birthday-selects {
-  display: flex;
-  gap: 8px;
-}
-
-.birthday-selects select {
-  flex: 1;
-  padding: 12px 8px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 15px;
-  background: #fff;
-  color: #333;
-  outline: none;
-  -webkit-appearance: none;
-  appearance: none;
-  text-align: center;
-}
-
-.birthday-selects select:focus {
-  border-color: #1a73e8;
-}
-
-.gender-options {
-  display: flex;
-  gap: 8px;
-}
-
-.gender-btn {
-  flex: 1;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background: #fff;
-  font-size: 14px;
-  color: #666;
-  cursor: pointer;
-  transition: all 0.2s;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.gender-btn.selected {
-  background: #1a73e8;
-  color: #fff;
-  border-color: #1a73e8;
-}
-
-.profile-submit {
-  width: 100%;
-  padding: 14px;
-  border: none;
-  border-radius: 8px;
-  background: #ccc;
-  color: #fff;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: not-allowed;
-  transition: all 0.2s;
-  margin-top: 8px;
-}
-
-.profile-submit:enabled {
-  background: #1a73e8;
-  cursor: pointer;
-}
-
-.profile-submit:enabled:active {
-  transform: scale(0.98);
-}
-
 /* エラー */
 .error-message {
   text-align: center;
@@ -341,7 +216,7 @@ body {
   cursor: pointer;
 }
 
-/* パスワードモーダル */
+/* モーダル共通 */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -365,6 +240,7 @@ body {
   overflow: hidden;
 }
 
+/* パスワードモーダル */
 .modal-header-bar {
   height: 6px;
   background: #E8728A;
@@ -425,4 +301,95 @@ body {
 .modal-btn.submit {
   background: #E8728A;
   color: #fff;
+}
+
+/* Q&A LINE 誘導モーダル */
+.qa-modal {
+  max-width: 340px;
+  padding: 0;
+}
+
+.qa-modal-header {
+  height: 6px;
+  background: linear-gradient(135deg, #2C5F2D, #4CAF50);
+}
+
+.qa-modal-body {
+  padding: 24px;
+}
+
+.qa-app-icon {
+  font-size: 56px;
+  line-height: 1;
+  margin-bottom: 12px;
+}
+
+.qa-modal-body h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.qa-app-desc {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.qa-divider {
+  height: 1px;
+  background: #e0e0e0;
+  margin: 0 -8px 16px;
+}
+
+.qa-guide-text {
+  font-size: 13px;
+  color: #333;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.qa-guide-text strong {
+  color: #2C5F2D;
+}
+
+.qa-add-friend-btn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  background: #06C755;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  -webkit-tap-highlight-color: transparent;
+  margin-bottom: 10px;
+}
+
+.qa-add-friend-btn:active {
+  opacity: 0.85;
+}
+
+.qa-close-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #f0f0f0;
+  color: #666;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.qa-close-btn:active {
+  opacity: 0.85;
 }

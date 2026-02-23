@@ -1,19 +1,18 @@
 /**
- * LIFF アプリ選択メニュー
+ * LIFF アプリ選択メニュー（静的ディレクトリ版）
+ * アプリ選択 → Q&A LINE への友だち追加を誘導
  */
 (function () {
   'use strict';
 
   // === 設定 ===
   var LIFF_ID = '2009188037-EJ4sq6gE';
-  var PROFILE_KEY = 'liff_profile_registered';
   var HIDDEN_KEY = 'liff_hidden_unlocked';
   var HIDDEN_PW = 'shikiboubou';
-  var GAS_URL = 'https://script.google.com/macros/s/AKfycbz_qLj8AaQ4pBO9_Kov4u5_GiDIYLupbsODClQ0rtPF3BAmrbT1s_4q9z0s_LjnmZmPiA/exec';
+  // Q&A LINE 友だち追加URL（チャネル作成後に設定）
+  var QA_LINE_ADD_FRIEND_URL = 'https://line.me/R/ti/p/PLACEHOLDER';
 
   // === DOM要素 ===
-  var profileForm = document.getElementById('profileForm');
-  var appSection = document.getElementById('appSection');
   var searchInput = document.getElementById('searchInput');
   var categoriesContainer = document.getElementById('categories');
   var appGrid = document.getElementById('appGrid');
@@ -23,9 +22,20 @@
   var allCategories = [];
   var currentCategory = 'all';
   var currentSearch = '';
-  var selectedGender = '';
   var hiddenUnlocked = localStorage.getItem(HIDDEN_KEY) === '1';
-  var liffUserId = '';
+
+  // === アプリ詳細情報 ===
+  var appDetails = {
+    storytelling: {
+      description: 'ストーリーで学ぶプレゼン術。チャプター形式の学習とクイズで、話し方のスキルが身につきます。',
+    },
+    personality: {
+      description: '12動物の個性を学んで覚えよう。個性心理学のチャプター学習とクイズで理解を深めます。',
+    },
+    animals_consult: {
+      description: '5アニマルで相手との関わり方をAI分析。診断スクショを送るだけで、関係性のアドバイスがもらえます。',
+    },
+  };
 
   // === LIFF 初期化 ===
   liff.init({ liffId: LIFF_ID })
@@ -35,16 +45,10 @@
           liff.login();
           return;
         }
-        // userId取得（失敗してもUI表示は続行）
-        liff.getProfile()
-          .then(function (profile) { liffUserId = profile.userId; })
-          .catch(function () {});
-        // プロフィール登録済みか確認
-        if (localStorage.getItem(PROFILE_KEY)) {
-          showAppSection();
-        } else {
-          showProfileForm();
-        }
+        var lockBtn = document.getElementById('lockBtn');
+        lockBtn.textContent = hiddenUnlocked ? '🔓' : '🔒';
+        initLockButton();
+        loadApps();
       } catch (e) {
         console.error('App display error:', e);
         showError('表示エラー: ' + e.message);
@@ -54,143 +58,6 @@
       console.error('LIFF init error:', err);
       showError('LIFFの初期化に失敗しました: ' + (err.message || err));
     });
-
-  // === プロフィールフォーム表示 ===
-  function showProfileForm() {
-    profileForm.style.display = 'block';
-    appSection.style.display = 'none';
-    categoriesContainer.style.display = 'none';
-    appGrid.style.display = 'none';
-    initProfileForm();
-  }
-
-  // === アプリ一覧表示 ===
-  function showAppSection() {
-    profileForm.style.display = 'none';
-    appSection.style.display = '';
-    categoriesContainer.style.display = '';
-    appGrid.style.display = '';
-    // 鍵アイコンの初期状態
-    var lockBtn = document.getElementById('lockBtn');
-    lockBtn.textContent = hiddenUnlocked ? '🔓' : '🔒';
-    initLockButton();
-    loadApps();
-  }
-
-  // === プロフィールフォーム初期化 ===
-  function initProfileForm() {
-    var yearSelect = document.getElementById('birthYear');
-    var monthSelect = document.getElementById('birthMonth');
-    var daySelect = document.getElementById('birthDay');
-    var submitBtn = document.getElementById('profileSubmit');
-    var nicknameInput = document.getElementById('nickname');
-
-    // 年（1940〜今年）
-    var currentYear = new Date().getFullYear();
-    for (var y = currentYear; y >= 1940; y--) {
-      var opt = document.createElement('option');
-      opt.value = y;
-      opt.textContent = y + '年';
-      yearSelect.appendChild(opt);
-    }
-
-    // 月
-    for (var m = 1; m <= 12; m++) {
-      var opt = document.createElement('option');
-      opt.value = m;
-      opt.textContent = m + '月';
-      monthSelect.appendChild(opt);
-    }
-
-    // 日
-    for (var d = 1; d <= 31; d++) {
-      var opt = document.createElement('option');
-      opt.value = d;
-      opt.textContent = d + '日';
-      daySelect.appendChild(opt);
-    }
-
-    // 性別ボタン
-    document.querySelectorAll('.gender-btn').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        document.querySelectorAll('.gender-btn').forEach(function (b) {
-          b.classList.remove('selected');
-        });
-        this.classList.add('selected');
-        selectedGender = this.getAttribute('data-value');
-        validateForm();
-      });
-    });
-
-    // バリデーション
-    nicknameInput.addEventListener('input', validateForm);
-    yearSelect.addEventListener('change', validateForm);
-    monthSelect.addEventListener('change', validateForm);
-    daySelect.addEventListener('change', validateForm);
-
-    // 送信
-    submitBtn.addEventListener('click', submitProfile);
-  }
-
-  // === バリデーション ===
-  function validateForm() {
-    var nickname = document.getElementById('nickname').value.trim();
-    var year = document.getElementById('birthYear').value;
-    var month = document.getElementById('birthMonth').value;
-    var day = document.getElementById('birthDay').value;
-    var btn = document.getElementById('profileSubmit');
-
-    if (nickname && year && month && day && selectedGender) {
-      btn.disabled = false;
-    } else {
-      btn.disabled = true;
-    }
-  }
-
-  // === プロフィール送信 → GAS API（通知なし） ===
-  function submitProfile() {
-    var nickname = document.getElementById('nickname').value.trim();
-    var year = document.getElementById('birthYear').value;
-    var month = String(document.getElementById('birthMonth').value).padStart(2, '0');
-    var day = String(document.getElementById('birthDay').value).padStart(2, '0');
-    var birthday = year + '-' + month + '-' + day;
-    var btn = document.getElementById('profileSubmit');
-
-    btn.disabled = true;
-    btn.textContent = '登録中...';
-
-    if (!liff.isInClient()) {
-      alert('このページはLINEアプリ内で開いてください');
-      btn.disabled = false;
-      btn.textContent = '登録する';
-      return;
-    }
-
-    if (liffUserId) {
-      var url = GAS_URL +
-        '?action=registerProfile' +
-        '&userId=' + encodeURIComponent(liffUserId) +
-        '&nickname=' + encodeURIComponent(nickname) +
-        '&birthday=' + encodeURIComponent(birthday) +
-        '&gender=' + encodeURIComponent(selectedGender);
-      new Image().src = url;
-      localStorage.setItem(PROFILE_KEY, '1');
-      setTimeout(function () { liff.closeWindow(); }, 1500);
-    } else {
-      liff.sendMessages([{
-        type: 'text',
-        text: '\u30d7\u30ed\u30d5\u30a3\u30fc\u30eb:' + nickname + ':' + birthday + ':' + selectedGender
-      }])
-        .then(function () {
-          localStorage.setItem(PROFILE_KEY, '1');
-          liff.closeWindow();
-        })
-        .catch(function () {
-          btn.disabled = false;
-          btn.textContent = '登録する';
-        });
-    }
-  }
 
   // === アプリ一覧読み込み ===
   function loadApps() {
@@ -278,31 +145,39 @@
     });
   }
 
-  // === アプリ選択 → GAS API → 閉じる（通知なし） ===
+  // === アプリ選択 → Q&A LINE 誘導モーダル表示 ===
   function selectApp(appId) {
-    if (!liff.isInClient()) {
-      alert('このページはLINEアプリ内で開いてください');
-      return;
-    }
+    var app = allApps.find(function (a) { return a.id === appId; });
+    if (!app) return;
 
-    appGrid.innerHTML =
-      '<div class="loading"><div class="loading-spinner"></div></div>';
+    var modal = document.getElementById('qaModal');
+    document.getElementById('qaAppIcon').textContent = app.icon;
+    document.getElementById('qaAppName').textContent = app.name;
 
-    if (liffUserId) {
-      // GAS API直接呼び出し（通知なし）
-      var url = GAS_URL +
-        '?action=selectApp' +
-        '&userId=' + encodeURIComponent(liffUserId) +
-        '&appId=' + encodeURIComponent(appId);
-      new Image().src = url;
-      setTimeout(function () { liff.closeWindow(); }, 1500);
-    } else {
-      // フォールバック: sendMessages
-      liff.sendMessages([{ type: 'text', text: '\u30a2\u30d7\u30ea:' + appId }])
-        .then(function () { liff.closeWindow(); })
-        .catch(function () { liff.closeWindow(); });
-    }
+    var detail = appDetails[appId];
+    document.getElementById('qaAppDesc').textContent = detail
+      ? detail.description
+      : app.description;
+
+    modal.style.display = 'flex';
   }
+
+  // === Q&A LINE 誘導モーダルイベント ===
+  document.getElementById('qaAddFriend').addEventListener('click', function () {
+    if (liff.isInClient()) {
+      liff.openWindow({ url: QA_LINE_ADD_FRIEND_URL, external: true });
+    } else {
+      window.open(QA_LINE_ADD_FRIEND_URL, '_blank');
+    }
+  });
+
+  document.getElementById('qaClose').addEventListener('click', function () {
+    document.getElementById('qaModal').style.display = 'none';
+  });
+
+  document.getElementById('qaModal').addEventListener('click', function (e) {
+    if (e.target === this) this.style.display = 'none';
+  });
 
   // === 鍵ボタン ===
   function initLockButton() {
@@ -315,7 +190,6 @@
 
     lockBtn.addEventListener('click', function () {
       if (hiddenUnlocked) {
-        // 再ロック
         hiddenUnlocked = false;
         localStorage.removeItem(HIDDEN_KEY);
         lockBtn.textContent = '🔒';
@@ -324,7 +198,6 @@
         renderApps();
         return;
       }
-      // モーダル表示
       modal.style.display = 'flex';
       pwInput.value = '';
       pwError.style.display = 'none';
