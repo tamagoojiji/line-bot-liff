@@ -3,15 +3,58 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>たまごの相談部屋</title>
+  <title>アプリ選択メニュー</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="redirect-page">
-    <div class="redirect-icon">📱</div>
-    <h1>アプリは移動しました</h1>
-    <p>アプリは<strong>「たまごのアプリ部屋」</strong>に移動しました。<br>下のボタンから友だち追加してね！</p>
-    <button id="addFriendBtn" class="add-friend-btn">たまごのアプリ部屋を友だち追加</button>
+  <!-- ヘッダー -->
+  <div id="appSection" class="header">
+    <div class="header-row">
+      <h1>🎯 アプリ一覧</h1>
+      <button id="lockBtn" class="lock-btn">🔒</button>
+    </div>
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="アプリを検索...">
+    </div>
+  </div>
+
+  <!-- カテゴリタブ -->
+  <div id="categories" class="categories"></div>
+
+  <!-- アプリグリッド -->
+  <div id="appGrid" class="app-grid">
+    <div class="loading"><div class="loading-spinner"></div></div>
+  </div>
+
+  <!-- 相談部屋LINE誘導モーダル -->
+  <div id="qaModal" class="modal-overlay" style="display:none;">
+    <div class="modal-content qa-modal">
+      <div class="qa-modal-header"></div>
+      <div class="qa-modal-body">
+        <div class="qa-app-icon" id="qaAppIcon"></div>
+        <h2 id="qaAppName"></h2>
+        <p id="qaAppDesc" class="qa-app-desc"></p>
+        <div class="qa-divider"></div>
+        <p class="qa-guide-text">このアプリは<strong>「たまごの相談部屋」</strong>LINEで使えます</p>
+        <button id="qaAddFriend" class="qa-add-friend-btn">友だち追加して始める</button>
+        <button id="qaClose" class="qa-close-btn">閉じる</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- パスワードモーダル -->
+  <div id="pwModal" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+      <div class="modal-header-bar"></div>
+      <h2>パスワードを入力</h2>
+      <input type="password" id="pwInput" placeholder="パスワード" autocomplete="off">
+      <div id="pwError" class="pw-error" style="display:none;">パスワードが違います</div>
+      <div class="modal-buttons">
+        <button id="pwCancel" class="modal-btn cancel">キャンセル</button>
+        <button id="pwSubmit" class="modal-btn submit">解除</button>
+      </div>
+    </div>
   </div>
 
   <!-- LIFF SDK -->
