@@ -32,12 +32,13 @@
     .then(function () {
       if (!liff.isInClient() && !liff.isLoggedIn()) {
         liff.login();
-        return Promise.reject('redirecting');
+        return;
       }
-      return liff.getProfile();
-    })
-    .then(function (profile) {
-      liffUserId = profile.userId;
+      // userId取得（失敗してもUI表示は続行）
+      liff.getProfile()
+        .then(function (profile) { liffUserId = profile.userId; })
+        .catch(function () {});
+      // プロフィール登録済みか確認
       if (localStorage.getItem(PROFILE_KEY)) {
         showAppSection();
       } else {
@@ -45,7 +46,6 @@
       }
     })
     .catch(function (err) {
-      if (err === 'redirecting') return;
       console.error('LIFF init error:', err);
       showError('LIFFの初期化に失敗しました');
     });
@@ -161,19 +161,30 @@
       return;
     }
 
-    var url = GAS_URL +
-      '?action=registerProfile' +
-      '&userId=' + encodeURIComponent(liffUserId) +
-      '&nickname=' + encodeURIComponent(nickname) +
-      '&birthday=' + encodeURIComponent(birthday) +
-      '&gender=' + encodeURIComponent(selectedGender);
-    new Image().src = url;
-
-    localStorage.setItem(PROFILE_KEY, '1');
-
-    setTimeout(function () {
-      liff.closeWindow();
-    }, 1500);
+    if (liffUserId) {
+      var url = GAS_URL +
+        '?action=registerProfile' +
+        '&userId=' + encodeURIComponent(liffUserId) +
+        '&nickname=' + encodeURIComponent(nickname) +
+        '&birthday=' + encodeURIComponent(birthday) +
+        '&gender=' + encodeURIComponent(selectedGender);
+      new Image().src = url;
+      localStorage.setItem(PROFILE_KEY, '1');
+      setTimeout(function () { liff.closeWindow(); }, 1500);
+    } else {
+      liff.sendMessages([{
+        type: 'text',
+        text: '\u30d7\u30ed\u30d5\u30a3\u30fc\u30eb:' + nickname + ':' + birthday + ':' + selectedGender
+      }])
+        .then(function () {
+          localStorage.setItem(PROFILE_KEY, '1');
+          liff.closeWindow();
+        })
+        .catch(function () {
+          btn.disabled = false;
+          btn.textContent = '登録する';
+        });
+    }
   }
 
   // === アプリ一覧読み込み ===
@@ -272,15 +283,20 @@
     appGrid.innerHTML =
       '<div class="loading"><div class="loading-spinner"></div></div>';
 
-    var url = GAS_URL +
-      '?action=selectApp' +
-      '&userId=' + encodeURIComponent(liffUserId) +
-      '&appId=' + encodeURIComponent(appId);
-    new Image().src = url;
-
-    setTimeout(function () {
-      liff.closeWindow();
-    }, 1500);
+    if (liffUserId) {
+      // GAS API直接呼び出し（通知なし）
+      var url = GAS_URL +
+        '?action=selectApp' +
+        '&userId=' + encodeURIComponent(liffUserId) +
+        '&appId=' + encodeURIComponent(appId);
+      new Image().src = url;
+      setTimeout(function () { liff.closeWindow(); }, 1500);
+    } else {
+      // フォールバック: sendMessages
+      liff.sendMessages([{ type: 'text', text: '\u30a2\u30d7\u30ea:' + appId }])
+        .then(function () { liff.closeWindow(); })
+        .catch(function () { liff.closeWindow(); });
+    }
   }
 
   // === 鍵ボタン ===
