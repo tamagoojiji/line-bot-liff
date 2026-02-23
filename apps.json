@@ -4,21 +4,21 @@
     "name": "ストーリーテリング学習",
     "description": "物語で学ぶプレゼンテーション術",
     "icon": "📚",
-    "category": "学習"
+    "category": "ストーリーテリング"
   },
   {
     "id": "personality",
     "name": "個性心理学",
     "description": "12動物の個性を学んで覚えよう",
     "icon": "🧠",
-    "category": "学習"
+    "category": "個性心理学"
   },
   {
     "id": "animals_consult",
     "name": "5アニマルズ相談",
     "description": "5アニマルで相手との関わり方をAI分析",
     "icon": "🐾",
-    "category": "ツール",
+    "category": "個性心理学",
     "hidden": true
   }
 ]
