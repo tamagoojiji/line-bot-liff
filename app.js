@@ -30,24 +30,29 @@
   // === LIFF 初期化 ===
   liff.init({ liffId: LIFF_ID })
     .then(function () {
-      if (!liff.isInClient() && !liff.isLoggedIn()) {
-        liff.login();
-        return;
-      }
-      // userId取得（失敗してもUI表示は続行）
-      liff.getProfile()
-        .then(function (profile) { liffUserId = profile.userId; })
-        .catch(function () {});
-      // プロフィール登録済みか確認
-      if (localStorage.getItem(PROFILE_KEY)) {
-        showAppSection();
-      } else {
-        showProfileForm();
+      try {
+        if (!liff.isInClient() && !liff.isLoggedIn()) {
+          liff.login();
+          return;
+        }
+        // userId取得（失敗してもUI表示は続行）
+        liff.getProfile()
+          .then(function (profile) { liffUserId = profile.userId; })
+          .catch(function () {});
+        // プロフィール登録済みか確認
+        if (localStorage.getItem(PROFILE_KEY)) {
+          showAppSection();
+        } else {
+          showProfileForm();
+        }
+      } catch (e) {
+        console.error('App display error:', e);
+        showError('表示エラー: ' + e.message);
       }
     })
     .catch(function (err) {
       console.error('LIFF init error:', err);
-      showError('LIFFの初期化に失敗しました');
+      showError('LIFFの初期化に失敗しました: ' + (err.message || err));
     });
 
   // === プロフィールフォーム表示 ===
