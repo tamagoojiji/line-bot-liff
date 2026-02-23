@@ -12,5 +12,12 @@
     "description": "12動物の個性を学んで覚えよう",
     "icon": "🧠",
     "category": "学習"
+  },
+  {
+    "id": "animals_consult",
+    "name": "5アニマルズ相談",
+    "description": "5アニマルで相手との関わり方をAI分析",
+    "icon": "🐾",
+    "category": "ツール"
   }
 ]
