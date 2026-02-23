@@ -10,7 +10,7 @@
   var HIDDEN_KEY = 'liff_hidden_unlocked';
   var HIDDEN_PW = 'shikiboubou';
   // Q&A LINE 友だち追加URL（チャネル作成後に設定）
-  var QA_LINE_ADD_FRIEND_URL = 'https://line.me/R/ti/p/PLACEHOLDER';
+  var QA_LINE_ADD_FRIEND_URL = 'https://lin.ee/sRWAxgm';
 
   // === DOM要素 ===
   var searchInput = document.getElementById('searchInput');
