@@ -18,6 +18,7 @@
     "name": "5アニマルズ相談",
     "description": "5アニマルで相手との関わり方をAI分析",
     "icon": "🐾",
-    "category": "ツール"
+    "category": "ツール",
+    "hidden": true
   }
 ]

@@ -7,6 +7,8 @@
   // === 設定 ===
   var LIFF_ID = '2009188037-EJ4sq6gE';
   var PROFILE_KEY = 'liff_profile_registered';
+  var HIDDEN_KEY = 'liff_hidden_unlocked';
+  var HIDDEN_PW = 'shikiboubou';
 
   // === DOM要素 ===
   var profileForm = document.getElementById('profileForm');
@@ -21,6 +23,7 @@
   var currentCategory = 'all';
   var currentSearch = '';
   var selectedGender = '';
+  var hiddenUnlocked = localStorage.getItem(HIDDEN_KEY) === '1';
 
   // === LIFF 初期化 ===
   liff.init({ liffId: LIFF_ID })
@@ -56,6 +59,10 @@
     appSection.style.display = '';
     categoriesContainer.style.display = '';
     appGrid.style.display = '';
+    // 鍵アイコンの初期状態
+    var lockBtn = document.getElementById('lockBtn');
+    lockBtn.textContent = hiddenUnlocked ? '🔓' : '🔒';
+    initLockButton();
     loadApps();
   }
 
@@ -186,7 +193,9 @@
   function extractCategories(apps) {
     var cats = {};
     apps.forEach(function (app) {
-      if (app.category) cats[app.category] = true;
+      if (!app.hidden || hiddenUnlocked) {
+        if (app.category) cats[app.category] = true;
+      }
     });
     return Object.keys(cats);
   }
@@ -214,6 +223,7 @@
   // === アプリカード描画 ===
   function renderApps() {
     var filtered = allApps.filter(function (app) {
+      if (app.hidden && !hiddenUnlocked) return false;
       var matchCat = currentCategory === 'all' || app.category === currentCategory;
       var matchSearch = !currentSearch ||
         app.name.indexOf(currentSearch) !== -1 ||
@@ -266,6 +276,62 @@
         console.error('sendMessages error:', err);
         alert('メッセージ送信に失敗しました。もう一度お試しください。');
       });
+  }
+
+  // === 鍵ボタン ===
+  function initLockButton() {
+    var lockBtn = document.getElementById('lockBtn');
+    var modal = document.getElementById('pwModal');
+    var pwInput = document.getElementById('pwInput');
+    var pwError = document.getElementById('pwError');
+    var pwCancel = document.getElementById('pwCancel');
+    var pwSubmit = document.getElementById('pwSubmit');
+
+    lockBtn.addEventListener('click', function () {
+      if (hiddenUnlocked) {
+        // 再ロック
+        hiddenUnlocked = false;
+        localStorage.removeItem(HIDDEN_KEY);
+        lockBtn.textContent = '🔒';
+        allCategories = extractCategories(allApps);
+        renderCategories();
+        renderApps();
+        return;
+      }
+      // モーダル表示
+      modal.style.display = 'flex';
+      pwInput.value = '';
+      pwError.style.display = 'none';
+      pwInput.focus();
+    });
+
+    pwCancel.addEventListener('click', function () {
+      modal.style.display = 'none';
+    });
+
+    modal.addEventListener('click', function (e) {
+      if (e.target === modal) modal.style.display = 'none';
+    });
+
+    pwSubmit.addEventListener('click', function () {
+      if (pwInput.value === HIDDEN_PW) {
+        hiddenUnlocked = true;
+        localStorage.setItem(HIDDEN_KEY, '1');
+        lockBtn.textContent = '🔓';
+        modal.style.display = 'none';
+        allCategories = extractCategories(allApps);
+        renderCategories();
+        renderApps();
+      } else {
+        pwError.style.display = 'block';
+        pwInput.value = '';
+        pwInput.focus();
+      }
+    });
+
+    pwInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') pwSubmit.click();
+    });
   }
 
   // === 検索 ===
