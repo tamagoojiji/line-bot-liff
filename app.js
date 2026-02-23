@@ -9,6 +9,7 @@
   var PROFILE_KEY = 'liff_profile_registered';
   var HIDDEN_KEY = 'liff_hidden_unlocked';
   var HIDDEN_PW = 'shikiboubou';
+  var GAS_URL = 'https://script.google.com/macros/s/AKfycbz_qLj8AaQ4pBO9_Kov4u5_GiDIYLupbsODClQ0rtPF3BAmrbT1s_4q9z0s_LjnmZmPiA/exec';
 
   // === DOM要素 ===
   var profileForm = document.getElementById('profileForm');
@@ -24,15 +25,19 @@
   var currentSearch = '';
   var selectedGender = '';
   var hiddenUnlocked = localStorage.getItem(HIDDEN_KEY) === '1';
+  var liffUserId = '';
 
   // === LIFF 初期化 ===
   liff.init({ liffId: LIFF_ID })
     .then(function () {
       if (!liff.isInClient() && !liff.isLoggedIn()) {
         liff.login();
-        return;
+        return Promise.reject('redirecting');
       }
-      // プロフィール登録済みか確認
+      return liff.getProfile();
+    })
+    .then(function (profile) {
+      liffUserId = profile.userId;
       if (localStorage.getItem(PROFILE_KEY)) {
         showAppSection();
       } else {
@@ -40,6 +45,7 @@
       }
     })
     .catch(function (err) {
+      if (err === 'redirecting') return;
       console.error('LIFF init error:', err);
       showError('LIFFの初期化に失敗しました');
     });
@@ -136,7 +142,7 @@
     }
   }
 
-  // === プロフィール送信 ===
+  // === プロフィール送信 → GAS API（通知なし） ===
   function submitProfile() {
     var nickname = document.getElementById('nickname').value.trim();
     var year = document.getElementById('birthYear').value;
@@ -155,21 +161,19 @@
       return;
     }
 
-    // 「プロフィール:ニックネーム:生年月日:性別」形式で送信
-    liff.sendMessages([{
-      type: 'text',
-      text: '\u30d7\u30ed\u30d5\u30a3\u30fc\u30eb:' + nickname + ':' + birthday + ':' + selectedGender
-    }])
-      .then(function () {
-        localStorage.setItem(PROFILE_KEY, '1');
-        liff.closeWindow();
-      })
-      .catch(function (err) {
-        console.error('sendMessages error:', err);
-        alert('送信に失敗しました。もう一度お試しください。');
-        btn.disabled = false;
-        btn.textContent = '登録する';
-      });
+    var url = GAS_URL +
+      '?action=registerProfile' +
+      '&userId=' + encodeURIComponent(liffUserId) +
+      '&nickname=' + encodeURIComponent(nickname) +
+      '&birthday=' + encodeURIComponent(birthday) +
+      '&gender=' + encodeURIComponent(selectedGender);
+    new Image().src = url;
+
+    localStorage.setItem(PROFILE_KEY, '1');
+
+    setTimeout(function () {
+      liff.closeWindow();
+    }, 1500);
   }
 
   // === アプリ一覧読み込み ===
@@ -258,24 +262,25 @@
     });
   }
 
-  // === アプリ選択 → メッセージ送信 → 閉じる ===
+  // === アプリ選択 → GAS API → 閉じる（通知なし） ===
   function selectApp(appId) {
     if (!liff.isInClient()) {
       alert('このページはLINEアプリ内で開いてください');
       return;
     }
 
-    liff.sendMessages([{
-      type: 'text',
-      text: '\u30a2\u30d7\u30ea:' + appId
-    }])
-      .then(function () {
-        liff.closeWindow();
-      })
-      .catch(function (err) {
-        console.error('sendMessages error:', err);
-        alert('メッセージ送信に失敗しました。もう一度お試しください。');
-      });
+    appGrid.innerHTML =
+      '<div class="loading"><div class="loading-spinner"></div></div>';
+
+    var url = GAS_URL +
+      '?action=selectApp' +
+      '&userId=' + encodeURIComponent(liffUserId) +
+      '&appId=' + encodeURIComponent(appId);
+    new Image().src = url;
+
+    setTimeout(function () {
+      liff.closeWindow();
+    }, 1500);
   }
 
   // === 鍵ボタン ===
