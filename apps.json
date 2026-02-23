@@ -5,5 +5,12 @@
     "description": "物語で学ぶプレゼンテーション術",
     "icon": "📚",
     "category": "学習"
+  },
+  {
+    "id": "personality",
+    "name": "個性心理学",
+    "description": "12動物の個性を学んで覚えよう",
+    "icon": "🧠",
+    "category": "学習"
   }
 ]
