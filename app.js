@@ -145,21 +145,25 @@
     });
   }
 
-  // === アプリ選択 → 相談部屋LINE誘導モーダル表示 ===
+  // === アプリ選択 → メッセージ送信して起動 ===
+  var appCommands = {
+    storytelling: 'ストーリーテリング',
+    personality: '個性心理学',
+    animals_consult: '5アニマルズ相談',
+  };
+
   function selectApp(appId) {
-    var app = allApps.find(function (a) { return a.id === appId; });
-    if (!app) return;
+    var command = appCommands[appId];
+    if (!command) return;
 
-    var modal = document.getElementById('qaModal');
-    document.getElementById('qaAppIcon').textContent = app.icon;
-    document.getElementById('qaAppName').textContent = app.name;
-
-    var detail = appDetails[appId];
-    document.getElementById('qaAppDesc').textContent = detail
-      ? detail.description
-      : app.description;
-
-    modal.style.display = 'flex';
+    liff.sendMessage({ type: 'text', text: command })
+      .then(function () {
+        liff.closeWindow();
+      })
+      .catch(function (err) {
+        console.error('sendMessage error:', err);
+        alert('送信に失敗しました。もう一度お試しください。');
+      });
   }
 
   // === 相談部屋LINE誘導モーダルイベント ===
