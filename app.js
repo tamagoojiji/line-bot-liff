@@ -156,14 +156,20 @@
     var command = appCommands[appId];
     if (!command) return;
 
-    liff.sendMessage({ type: 'text', text: command })
-      .then(function () {
-        liff.closeWindow();
-      })
-      .catch(function (err) {
-        console.error('sendMessage error:', err);
-        alert('送信に失敗しました。もう一度お試しください。');
-      });
+    // LIFF内ならsendMessage、失敗時はフォールバック
+    if (liff.isInClient()) {
+      liff.sendMessage({ type: 'text', text: command })
+        .then(function () {
+          liff.closeWindow();
+        })
+        .catch(function () {
+          // sendMessage失敗時: LIFFを閉じてユーザーに手入力を促す
+          alert('「' + command + '」と送信してください');
+          liff.closeWindow();
+        });
+    } else {
+      alert('LINEアプリ内で開いてください');
+    }
   }
 
   // === 相談部屋LINE誘導モーダルイベント ===
