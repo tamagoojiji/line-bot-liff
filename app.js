@@ -154,21 +154,24 @@
 
   function selectApp(appId) {
     var command = appCommands[appId];
-    if (!command) return;
+    if (!command) {
+      alert('DEBUG: command not found for ' + appId);
+      return;
+    }
 
-    // LIFF内ならsendMessage、失敗時はフォールバック
+    alert('「' + command + '」を起動します');
+
     if (liff.isInClient()) {
       liff.sendMessage({ type: 'text', text: command })
         .then(function () {
           liff.closeWindow();
         })
-        .catch(function () {
-          // sendMessage失敗時: LIFFを閉じてユーザーに手入力を促す
-          alert('「' + command + '」と送信してください');
+        .catch(function (err) {
+          alert('送信エラー: ' + (err.message || err));
           liff.closeWindow();
         });
     } else {
-      alert('LINEアプリ内で開いてください');
+      alert('DEBUG: not in client');
     }
   }
 
